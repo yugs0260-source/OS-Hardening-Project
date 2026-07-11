@@ -1,0 +1,238 @@
+/* ============================================================
+   report.css — Printable report styles
+   ============================================================ */
+
+.report-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Report header */
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2xl);
+  background: linear-gradient(135deg, rgba(0,245,160,0.06), rgba(0,217,245,0.04));
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.report-header::before {
+  content: 'SECURITY REPORT';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  transform: translateY(-50%) rotate(-10deg);
+  font-family: 'Orbitron', monospace;
+  font-size: 5rem;
+  font-weight: 900;
+  color: rgba(0,245,160,0.03);
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.report-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.report-brand .brand-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-brand .brand-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: #000;
+}
+
+.report-brand-text h2 {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.report-brand-text p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.report-meta {
+  text-align: right;
+}
+
+.report-meta .report-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Score summary */
+.report-score-summary {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.report-score-card {
+  flex: 1;
+  padding: var(--space-xl);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.report-score-card .big-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: var(--space-xs);
+}
+
+.report-score-card .big-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.report-score-card.main {
+  flex: 2;
+  background: linear-gradient(135deg, rgba(0,245,160,0.08), rgba(0,217,245,0.05));
+  border-color: rgba(0,245,160,0.2);
+}
+
+/* Individual check report rows */
+.report-checks {
+  margin-bottom: var(--space-xl);
+}
+
+.report-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-fast);
+}
+
+.report-check-row:last-child { border-bottom: none; }
+
+.report-check-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.report-check-status-col {
+  flex-shrink: 0;
+  width: 100px;
+  padding-top: 2px;
+}
+
+.report-check-body {
+  flex: 1;
+}
+
+.report-check-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.report-check-detail {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.report-check-rec {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.report-check-rec::before {
+  content: '→';
+  flex-shrink: 0;
+  color: var(--accent-green);
+}
+
+.report-check-score-col {
+  flex-shrink: 0;
+  width: 60px;
+  text-align: right;
+}
+
+.report-check-score-col .score-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Print button */
+.print-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  margin-bottom: var(--space-xl);
+}
+
+/* ──────────────────────────────────────────────
+   Print Styles
+   ────────────────────────────────────────────── */
+@media print {
+  body {
+    background: #fff !important;
+    color: #1a1a1a !important;
+  }
+
+  body::before { display: none !important; }
+
+  .sidebar, .topbar, .print-actions, .btn {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+
+  .card, .report-score-card, .report-header {
+    background: #f8f8f8 !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .badge-secure  { background: #d4f7e7 !important; color: #065f46 !important; border-color: #065f46 !important; }
+  .badge-warning { background: #fef9c3 !important; color: #854d0e !important; border-color: #854d0e !important; }
+  .badge-danger  { background: #fee2e2 !important; color: #991b1b !important; border-color: #991b1b !important; }
+  .badge-unknown { background: #f1f5f9 !important; color: #475569 !important; border-color: #475569 !important; }
+
+  h1, h2, h3, h4 { color: #1a1a1a !important; }
+  p, td, th     { color: #374151 !important; }
+  .text-muted, .text-secondary { color: #6b7280 !important; }
+
+  .report-header::before { display: none !important; }
+
+  @page {
+    margin: 20mm;
+    size: A4;
+  }
+}

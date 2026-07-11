@@ -1,0 +1,174 @@
+/* ============================================================
+   linux.css — Linux platform accent theme (orange)
+   ============================================================ */
+
+:root {
+  --linux-accent:      #f97316;
+  --linux-accent-dim:  rgba(249, 115, 22, 0.12);
+  --linux-accent-glow: 0 0 20px rgba(249, 115, 22, 0.35);
+  --linux-gradient:    linear-gradient(135deg, #f97316, #fbbf24);
+}
+
+/* Linux page header */
+.linux-page .page-header h1 .accent { color: var(--linux-accent); }
+
+/* Linux OS icon (Tux penguin-inspired) */
+.os-icon-linux {
+  width: 48px;
+  height: 48px;
+  background: var(--linux-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--linux-accent-glow);
+  font-size: 1.6rem;
+}
+
+/* Linux section nav */
+.linux-section-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.linux-section-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  background: rgba(249,115,22,0.06);
+  border: 1px solid rgba(249,115,22,0.15);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  transition: all var(--transition-normal);
+}
+
+.linux-section-link svg {
+  width: 28px;
+  height: 28px;
+  color: var(--linux-accent);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.linux-section-link:hover {
+  background: rgba(249,115,22,0.12);
+  border-color: var(--linux-accent);
+  color: var(--linux-accent);
+  transform: translateY(-3px);
+  box-shadow: var(--linux-accent-glow);
+}
+
+.linux-section-link:hover svg { opacity: 1; }
+
+.linux-section-link .link-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+/* Linux detail header */
+.linux-detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(251,191,36,0.04));
+  border: 1px solid rgba(249,115,22,0.2);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.linux-detail-header .status-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: var(--linux-accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.linux-detail-header .status-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--linux-accent);
+}
+
+/* Command hint box */
+.cmd-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(249,115,22,0.06);
+  border: 1px solid rgba(249,115,22,0.2);
+  border-left: 3px solid var(--linux-accent);
+  border-radius: var(--radius-md);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--linux-accent);
+}
+
+.cmd-hint svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Terminal output simulation */
+.terminal-output {
+  background: #080d1a;
+  border: 1px solid rgba(249,115,22,0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: #a0aec0;
+  line-height: 1.8;
+}
+
+.terminal-output .prompt {
+  color: var(--linux-accent);
+  font-weight: 600;
+}
+
+.terminal-output .cmd-text {
+  color: #e2e8f0;
+}
+
+.terminal-output .output-line {
+  color: #68d391;
+  padding-left: 1rem;
+}
+
+.section-info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.section-info-table tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.section-info-table tr:last-child { border-bottom: none; }
+
+.section-info-table td {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 0.875rem;
+}
+
+.section-info-table td:first-child {
+  color: var(--text-muted);
+  width: 180px;
+  font-weight: 500;
+}

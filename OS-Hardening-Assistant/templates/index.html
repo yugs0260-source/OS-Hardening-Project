@@ -1,0 +1,492 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="OS Hardening Assistant — Harden Windows and Linux with guided security checks, scripts, and reports.">
+  <title>OS Hardening Assistant — Home</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <style>
+    /* Index-specific: full-screen hero, no sidebar */
+    body { overflow-x: hidden; }
+
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2xl) var(--space-xl);
+      position: relative;
+      text-align: center;
+    }
+
+    /* Animated radial glow */
+    .hero-section::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(ellipse, rgba(0,245,160,0.07) 0%, transparent 65%);
+      pointer-events: none;
+      animation: hero-pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes hero-pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+      50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 6px 18px;
+      background: rgba(0,245,160,0.1);
+      border: 1px solid rgba(0,245,160,0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-green);
+      margin-bottom: var(--space-xl);
+      animation: fade-in-down 0.6s ease both;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .hero-shield {
+      margin-bottom: var(--space-xl);
+      animation: fade-in-down 0.6s ease 0.1s both;
+    }
+
+    .shield-icon {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, rgba(0,245,160,0.12), rgba(0,217,245,0.08));
+      border: 2px solid rgba(0,245,160,0.25);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      box-shadow: 0 0 60px rgba(0,245,160,0.15);
+      animation: shield-float 4s ease-in-out infinite;
+    }
+
+    .shield-icon svg {
+      width: 52px;
+      height: 52px;
+      color: var(--accent-green);
+      filter: drop-shadow(0 0 10px rgba(0,245,160,0.6));
+    }
+
+    @keyframes shield-float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-md);
+      animation: fade-in-up 0.7s ease 0.2s both;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-2xl);
+      animation: fade-in-up 0.7s ease 0.3s both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-3xl);
+      animation: fade-in-up 0.7s ease 0.4s both;
+    }
+
+    /* OS Selection Cards */
+    .os-cards {
+      display: flex;
+      gap: var(--space-xl);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-3xl);
+      animation: fade-in-up 0.8s ease 0.5s both;
+    }
+
+    .os-card {
+      width: 280px;
+      padding: var(--space-2xl) var(--space-xl);
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .os-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    .os-card.windows::before { background: linear-gradient(90deg, #4f8fff, #00d9f5); }
+    .os-card.linux::before   { background: linear-gradient(90deg, #f97316, #fbbf24); }
+
+    .os-card:hover::before { opacity: 1; }
+
+    .os-card.windows:hover {
+      border-color: rgba(79,143,255,0.4);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(79,143,255,0.2);
+    }
+
+    .os-card.linux:hover {
+      border-color: rgba(249,115,22,0.4);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(249,115,22,0.2);
+    }
+
+    .os-card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-lg);
+      font-size: 2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .os-card:hover .os-card-icon { transform: scale(1.1); }
+
+    .os-card.windows .os-card-icon {
+      background: linear-gradient(135deg, #4f8fff22, #00d9f522);
+      border: 1px solid rgba(79,143,255,0.3);
+    }
+
+    .os-card.linux .os-card-icon {
+      background: linear-gradient(135deg, #f9731622, #fbbf2422);
+      border: 1px solid rgba(249,115,22,0.3);
+    }
+
+    /* Windows logo */
+    .win-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      width: 36px;
+      height: 36px;
+    }
+    .win-grid span {
+      background: #4f8fff;
+      border-radius: 2px;
+      display: block;
+    }
+
+    .os-card-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+
+    .os-card.windows .os-card-title { color: #4f8fff; }
+    .os-card.linux   .os-card-title { color: #f97316; }
+
+    .os-card-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-lg);
+      line-height: 1.6;
+    }
+
+    .os-card-features {
+      text-align: left;
+    }
+
+    .os-card-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 4px 0;
+    }
+
+    .os-card-feature::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .os-card.windows .os-card-feature::before { background: #4f8fff; }
+    .os-card.linux   .os-card-feature::before { background: #f97316; }
+
+    /* Current OS badge */
+    .current-os-badge {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .os-card.windows .current-os-badge {
+      background: rgba(79,143,255,0.15);
+      color: #4f8fff;
+      border: 1px solid rgba(79,143,255,0.3);
+    }
+
+    .os-card.linux .current-os-badge {
+      background: rgba(249,115,22,0.15);
+      color: #f97316;
+      border: 1px solid rgba(249,115,22,0.3);
+    }
+
+    /* Feature grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+      max-width: 900px;
+      margin: 0 auto;
+      animation: fade-in-up 0.8s ease 0.6s both;
+    }
+
+    .feature-item {
+      text-align: center;
+      padding: var(--space-lg);
+    }
+
+    .feature-item .fi-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .feature-item h4 {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .feature-item p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Navbar for home page (simplified) */
+    .home-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-2xl);
+      background: rgba(8,13,26,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .home-nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+    }
+
+    .home-nav-logo svg {
+      width: 22px;
+      height: 22px;
+      color: var(--accent-green);
+    }
+
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-in-down {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Simplified home navbar -->
+  <nav class="home-nav" role="navigation" aria-label="Home navigation">
+    <a href="/" class="home-nav-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      OS HARDENING ASSISTANT
+    </a>
+    <div style="display:flex;gap:1rem;">
+      <a href="{% url 'hardening:dashboard' %}" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="{% url 'hardening:global_report' %}" class="btn btn-outline btn-sm">Report</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero-section" role="main">
+      <!-- Badge -->
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Security Hardening Tool
+      </div>
+
+      <!-- Shield icon -->
+      <div class="hero-shield" aria-hidden="true">
+        <div class="shield-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="hero-title">
+        <span class="text-gradient">OS Hardening</span><br>
+        <span style="color:var(--text-primary)">Assistant</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Comprehensive security hardening for <strong>Windows</strong> and <strong>Linux</strong> systems.
+        Real-time checks, guided scripts, and detailed security reports.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="hero-cta">
+        <a href="{% url 'hardening:dashboard' %}" class="btn btn-primary btn-lg" id="btn-go-dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Open Dashboard
+        </a>
+        <a href="{% url 'hardening:global_report' %}" class="btn btn-secondary btn-lg" id="btn-go-report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          View Report
+        </a>
+      </div>
+
+      <!-- OS Selection -->
+      <div class="os-cards">
+        <!-- Windows Card -->
+        <a href="{% url 'hardening:windows_home' %}" class="os-card windows" id="card-windows" role="button" aria-label="Go to Windows hardening">
+          {% if os_type == 'windows' %}
+          <span class="current-os-badge">Current OS</span>
+          {% endif %}
+          <div class="os-card-icon" aria-hidden="true">
+            <div class="win-grid">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <h2 class="os-card-title">Windows</h2>
+          <p class="os-card-desc">Harden Windows 10/11 and Server with Firewall, Defender, BitLocker, and Update configuration.</p>
+          <div class="os-card-features">
+            <div class="os-card-feature">Windows Firewall configuration</div>
+            <div class="os-card-feature">Defender &amp; real-time protection</div>
+            <div class="os-card-feature">Windows Update enforcement</div>
+            <div class="os-card-feature">BitLocker &amp; SMBv1 hardening</div>
+            <div class="os-card-feature">Privileged user auditing</div>
+          </div>
+        </a>
+
+        <!-- Linux Card -->
+        <a href="{% url 'hardening:linux_home' %}" class="os-card linux" id="card-linux" role="button" aria-label="Go to Linux hardening">
+          {% if os_type == 'linux' %}
+          <span class="current-os-badge">Current OS</span>
+          {% endif %}
+          <div class="os-card-icon" aria-hidden="true">
+            <span style="font-size:2.5rem;">🐧</span>
+          </div>
+          <h2 class="os-card-title">Linux</h2>
+          <p class="os-card-desc">Secure Debian/Ubuntu and RHEL-based systems with UFW, SSH hardening, Fail2ban, and package updates.</p>
+          <div class="os-card-features">
+            <div class="os-card-feature">UFW Firewall management</div>
+            <div class="os-card-feature">SSH key-based hardening</div>
+            <div class="os-card-feature">Fail2ban brute-force protection</div>
+            <div class="os-card-feature">Package updates &amp; patching</div>
+            <div class="os-card-feature">System cleanup &amp; audit</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Feature overview -->
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="fi-icon">🔍</div>
+          <h4>Live Checks</h4>
+          <p>Real-time OS security status queries</p>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">📜</div>
+          <h4>Hardening Scripts</h4>
+          <p>Ready-to-run PowerShell &amp; Bash scripts</p>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">✅</div>
+          <h4>Checklists</h4>
+          <p>Interactive security task tracking</p>
+        </div>
+        <div class="feature-item">
+          <div class="fi-icon">📊</div>
+          <h4>Security Reports</h4>
+          <p>Printable security posture reports</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

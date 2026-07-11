@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/windows.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'hardening:index' %}">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="{% url 'hardening:windows_home' %}">Windows</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Firewall</span>
+      </nav>
+      <h1><span style="color:#4f8fff">Windows</span> Firewall</h1>
+      <p class="mt-sm">Configure and harden Windows Firewall for all network profiles.</p>
+    </div>
+    <a href="{% url 'hardening:win_report' %}" class="btn btn-secondary btn-sm">View Report</a>
+  </div>
+</div>
+
+<!-- Status Banner -->
+<div class="win-detail-header">
+  <div class="status-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+  </div>
+  <div style="flex:1;">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-sm);">
+      <h2 style="font-size:1.1rem;">{{ check.title }}</h2>
+      <span class="badge badge-{{ check.status }}">
+        {% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}
+      </span>
+    </div>
+    <p>{{ check.detail }}</p>
+  </div>
+  <div style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:{% if check.status == 'secure' %}var(--status-secure){% elif check.status == 'warning' %}var(--status-warning){% elif check.status == 'danger' %}var(--status-danger){% else %}var(--status-unknown){% endif %}">
+    {{ check.score }}
+    <span style="font-size:0.8rem;color:var(--text-muted)">/100</span>
+  </div>
+</div>
+
+<div class="grid-2 gap-lg">
+  <!-- Status Details -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Status Details</h3>
+    </div>
+    <table class="section-info-table">
+      <tr><td>Status</td><td><span class="badge badge-{{ check.status }}">{% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}</span></td></tr>
+      <tr><td>Score</td><td style="font-family:'Orbitron',monospace;font-weight:600;">{{ check.score }} / 100</td></tr>
+      <tr><td>Detail</td><td>{{ check.detail }}</td></tr>
+      <tr><td>Recommendation</td><td style="color:var(--accent-green);">{{ check.recommendation }}</td></tr>
+    </table>
+
+    <div class="policy-hint mt-md">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>To configure manually: <strong>Windows Security → Firewall &amp; network protection</strong> or run <code style="color:var(--win-accent)">wf.msc</code></div>
+    </div>
+  </div>
+
+  <!-- Script Viewer -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Hardening Script</h3>
+      <div style="display:flex;gap:var(--space-sm);">
+        <button class="btn btn-secondary btn-sm copy-btn" id="btn-copy-script" onclick="copyToClipboard(document.getElementById('script-content').innerText)" aria-label="Copy script">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button class="btn btn-primary btn-sm" id="btn-download-script"
+          onclick="downloadScript(document.getElementById('script-content').innerText, 'firewall.ps1')"
+          aria-label="Download script">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download .ps1
+        </button>
+      </div>
+    </div>
+
+    {% if script.error %}
+    <div class="policy-hint" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--status-danger)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span style="color:var(--status-danger)">{{ script.error }}</span>
+    </div>
+    {% endif %}
+
+    <div class="code-block mt-md">
+      <div class="code-block-header">
+        <span class="code-block-lang">PowerShell</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Run as Administrator</span>
+      </div>
+      <pre id="script-content">{{ script.content|default:"# Script not available" }}</pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

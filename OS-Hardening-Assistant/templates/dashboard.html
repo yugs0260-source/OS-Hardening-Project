@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'hardening:index' %}">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Dashboard</span>
+      </nav>
+      <h1>Security <span class="text-gradient">Dashboard</span></h1>
+      <p class="mt-sm">{{ os_info.system }} {{ os_info.release }} — {{ os_info.node }}</p>
+    </div>
+    <div style="display:flex;gap:var(--space-md);">
+      <button class="btn btn-secondary btn-refresh" id="btn-refresh-all" title="Refresh all checks" aria-label="Refresh all security checks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        Refresh
+      </button>
+      <a href="{% url 'hardening:global_report' %}" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Generate Report
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Score Section -->
+<div class="score-section">
+  <div class="score-ring-container" aria-label="Security score: {{ score }} out of 100">
+    <svg class="score-ring-svg" viewBox="0 0 160 160">
+      <circle class="score-ring-bg" cx="80" cy="80" r="70"/>
+      <circle class="score-ring-fill" cx="80" cy="80" r="70"/>
+    </svg>
+    <div class="score-center">
+      <span class="score-number" data-score="{{ score }}" data-grade="{{ grade.grade }}" style="color:{{ grade.color }}">{{ score }}</span>
+      <span class="score-label">/ 100</span>
+    </div>
+  </div>
+
+  <div class="score-info">
+    <h2>Security Score: <span style="color:{{ grade.color }}">{{ grade.label }}</span></h2>
+    <div class="grade-text" style="color:{{ grade.color }}">Grade: {{ grade.grade }}</div>
+
+    <div class="score-stats">
+      <div class="stat-item stat-secure">
+        <span class="stat-number">{{ secure_count }}</span>
+        <div class="stat-label">Secure</div>
+      </div>
+      <div class="stat-item stat-warning">
+        <span class="stat-number">{{ warning_count }}</span>
+        <div class="stat-label">Warning</div>
+      </div>
+      <div class="stat-item stat-danger">
+        <span class="stat-number">{{ danger_count }}</span>
+        <div class="stat-label">Danger</div>
+      </div>
+      <div class="stat-item stat-unknown">
+        <span class="stat-number">{{ unknown_count }}</span>
+        <div class="stat-label">Unknown</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Check Cards -->
+<h2 class="mb-lg">Security Checks</h2>
+<div class="checks-grid">
+  {% for key, check in checks.items %}
+  <a href="{% if os_type == 'windows' %}{% if key == 'firewall' %}{% url 'hardening:win_firewall' %}{% elif key == 'defender' %}{% url 'hardening:win_defender' %}{% elif key == 'updates' %}{% url 'hardening:win_updates' %}{% elif key == 'users' %}{% url 'hardening:win_users' %}{% else %}{% url 'hardening:dashboard' %}{% endif %}{% else %}{% if key == 'firewall' %}{% url 'hardening:lnx_firewall' %}{% elif key == 'ssh' %}{% url 'hardening:lnx_ssh' %}{% elif key == 'fail2ban' %}{% url 'hardening:lnx_fail2ban' %}{% elif key == 'updates' %}{% url 'hardening:lnx_updates' %}{% else %}{% url 'hardening:dashboard' %}{% endif %}{% endif %}"
+     class="check-card {{ check.status }}"
+     data-check="{{ key }}"
+     aria-label="{{ check.title }} — {{ check.status }}">
+    <div class="check-card-header">
+      <div class="check-card-icon" aria-hidden="true">
+        {% if key == 'firewall' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        {% elif key == 'defender' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        {% elif key == 'updates' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        {% elif key == 'users' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        {% elif key == 'ssh' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        {% elif key == 'fail2ban' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {% endif %}
+      </div>
+      <span class="badge badge-{{ check.status }}">
+        {% if check.status == 'secure' %}✓ Secure
+        {% elif check.status == 'warning' %}⚠ Warning
+        {% elif check.status == 'danger' %}✗ Danger
+        {% else %}? Unknown{% endif %}
+      </span>
+    </div>
+
+    <div class="check-card-title">{{ check.title }}</div>
+    <div class="check-card-detail">{{ check.detail }}</div>
+
+    <div class="check-card-score">
+      <div class="check-card-score-bar">
+        <div class="check-card-score-fill" style="width:{{ check.score }}%"></div>
+      </div>
+      <span class="check-card-score-num" style="color:{% if check.status == 'secure' %}var(--status-secure){% elif check.status == 'warning' %}var(--status-warning){% elif check.status == 'danger' %}var(--status-danger){% else %}var(--status-unknown){% endif %}">
+        {{ check.score }}
+      </span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="divider"></div>
+
+<!-- Quick Actions -->
+<h2 class="mb-lg">Quick Actions</h2>
+<div class="quick-actions">
+  <a href="{% if os_type == 'windows' %}{% url 'hardening:windows_home' %}{% else %}{% url 'hardening:linux_home' %}{% endif %}" class="quick-action-btn" id="qa-platform">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    {{ os_type|title }} Hardening
+  </a>
+  <a href="{% url 'hardening:global_report' %}" class="quick-action-btn" id="qa-report">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Security Report
+  </a>
+  <a href="{% if os_type == 'windows' %}{% url 'hardening:win_firewall' %}{% else %}{% url 'hardening:lnx_firewall' %}{% endif %}" class="quick-action-btn" id="qa-firewall">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/></svg>
+    Firewall Config
+  </a>
+  <a href="{% if os_type == 'windows' %}{% url 'hardening:win_updates' %}{% else %}{% url 'hardening:lnx_updates' %}{% endif %}" class="quick-action-btn" id="qa-updates">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+    System Updates
+  </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/progress.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

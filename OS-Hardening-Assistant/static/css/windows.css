@@ -1,0 +1,169 @@
+/* ============================================================
+   windows.css — Windows platform accent theme (blue)
+   ============================================================ */
+
+:root {
+  --win-accent:      #4f8fff;
+  --win-accent-dim:  rgba(79, 143, 255, 0.15);
+  --win-accent-glow: 0 0 20px rgba(79, 143, 255, 0.4);
+  --win-gradient:    linear-gradient(135deg, #4f8fff, #00d9f5);
+}
+
+/* Windows page header accent */
+.windows-page .page-header h1 .accent { color: var(--win-accent); }
+
+/* Windows nav highlight */
+.nav-item.windows-active {
+  background: var(--win-accent-dim);
+  color: var(--win-accent);
+  border-left-color: var(--win-accent);
+}
+
+/* Windows OS icon */
+.os-icon-windows {
+  width: 48px;
+  height: 48px;
+  background: var(--win-gradient);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--win-accent-glow);
+}
+
+/* Windows logo grid (4 squares) */
+.win-logo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 22px;
+  height: 22px;
+}
+
+.win-logo-grid span {
+  background: #fff;
+  border-radius: 1px;
+  display: block;
+}
+
+/* Windows section nav */
+.win-section-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.win-section-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  background: rgba(79,143,255,0.06);
+  border: 1px solid rgba(79,143,255,0.15);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  transition: all var(--transition-normal);
+}
+
+.win-section-link svg {
+  width: 28px;
+  height: 28px;
+  color: var(--win-accent);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.win-section-link:hover {
+  background: rgba(79,143,255,0.12);
+  border-color: var(--win-accent);
+  color: var(--win-accent);
+  transform: translateY(-3px);
+  box-shadow: var(--win-accent-glow);
+}
+
+.win-section-link:hover svg { opacity: 1; }
+
+.win-section-link .link-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+/* Windows detail page */
+.win-detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, rgba(79,143,255,0.08), rgba(0,217,245,0.05));
+  border: 1px solid rgba(79,143,255,0.2);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.win-detail-header .status-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: var(--win-accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.win-detail-header .status-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--win-accent);
+}
+
+.section-info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.section-info-table tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.section-info-table tr:last-child { border-bottom: none; }
+
+.section-info-table td {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 0.875rem;
+}
+
+.section-info-table td:first-child {
+  color: var(--text-muted);
+  width: 180px;
+  font-weight: 500;
+}
+
+/* Registry/Policy hint box */
+.policy-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(79,143,255,0.06);
+  border: 1px solid rgba(79,143,255,0.2);
+  border-left: 3px solid var(--win-accent);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.policy-hint svg {
+  width: 18px;
+  height: 18px;
+  color: var(--win-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}

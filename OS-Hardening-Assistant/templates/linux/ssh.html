@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/linux.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'hardening:index' %}">Home</a><span class="breadcrumb-sep">›</span>
+        <a href="{% url 'hardening:linux_home' %}">Linux</a><span class="breadcrumb-sep">›</span>
+        <span>SSH Hardening</span>
+      </nav>
+      <h1><span style="color:#f97316">SSH</span> Hardening</h1>
+      <p class="mt-sm">Secure your SSH daemon configuration to prevent unauthorized access.</p>
+    </div>
+    <a href="{% url 'hardening:lnx_report' %}" class="btn btn-secondary btn-sm">View Report</a>
+  </div>
+</div>
+
+<div class="linux-detail-header">
+  <div class="status-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+  </div>
+  <div style="flex:1;">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-sm);">
+      <h2 style="font-size:1.1rem;">{{ check.title }}</h2>
+      <span class="badge badge-{{ check.status }}">{% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}</span>
+    </div>
+    <p>{{ check.detail }}</p>
+  </div>
+  <div style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:{% if check.status == 'secure' %}var(--status-secure){% elif check.status == 'warning' %}var(--status-warning){% elif check.status == 'danger' %}var(--status-danger){% else %}var(--status-unknown){% endif %}">
+    {{ check.score }}<span style="font-size:0.8rem;color:var(--text-muted)">/100</span>
+  </div>
+</div>
+
+<div class="grid-2 gap-lg">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Status Details</h3></div>
+    <table class="section-info-table">
+      <tr><td>Status</td><td><span class="badge badge-{{ check.status }}">{% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}</span></td></tr>
+      <tr><td>Score</td><td style="font-family:'Orbitron',monospace;font-weight:600;">{{ check.score }} / 100</td></tr>
+      <tr><td>Detail</td><td>{{ check.detail }}</td></tr>
+      <tr><td>Recommendation</td><td style="color:var(--accent-green);">{{ check.recommendation }}</td></tr>
+    </table>
+
+    <h4 class="mt-lg mb-sm" style="font-size:0.85rem;color:var(--text-muted);">KEY SSH HARDENING SETTINGS</h4>
+    <div class="status-row"><div class="status-indicator secure"></div><code style="font-size:0.82rem;">PermitRootLogin no</code></div>
+    <div class="status-row"><div class="status-indicator secure"></div><code style="font-size:0.82rem;">PasswordAuthentication no</code></div>
+    <div class="status-row"><div class="status-indicator secure"></div><code style="font-size:0.82rem;">MaxAuthTries 3</code></div>
+    <div class="status-row"><div class="status-indicator secure"></div><code style="font-size:0.82rem;">X11Forwarding no</code></div>
+    <div class="status-row"><div class="status-indicator secure"></div><code style="font-size:0.82rem;">AllowTcpForwarding no</code></div>
+
+    <div class="cmd-hint mt-md">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      sudo nano /etc/ssh/sshd_config
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Hardening Script</h3>
+      <div style="display:flex;gap:var(--space-sm);">
+        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard(document.getElementById('script-content').innerText)" aria-label="Copy">Copy</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadScript(document.getElementById('script-content').innerText,'ssh.sh')" aria-label="Download">Download .sh</button>
+      </div>
+    </div>
+    <div class="cmd-hint mt-sm" style="background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25);color:var(--status-warning);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--status-warning);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      ⚠ Ensure SSH keys are configured before running. Locking password auth without keys will lock you out!
+    </div>
+    <div class="code-block mt-md">
+      <div class="code-block-header">
+        <span class="code-block-lang" style="color:var(--linux-accent)">Bash</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Medium Risk — Backup first</span>
+      </div>
+      <pre id="script-content">{{ script.content|default:"# Script not available" }}</pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

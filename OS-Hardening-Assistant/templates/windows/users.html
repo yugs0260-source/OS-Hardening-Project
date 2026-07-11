@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/windows.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'hardening:index' %}">Home</a><span class="breadcrumb-sep">›</span>
+        <a href="{% url 'hardening:windows_home' %}">Windows</a><span class="breadcrumb-sep">›</span>
+        <span>Users</span>
+      </nav>
+      <h1><span style="color:#4f8fff">User</span> Accounts</h1>
+      <p class="mt-sm">Audit local administrator accounts and privileged access.</p>
+    </div>
+    <a href="{% url 'hardening:win_report' %}" class="btn btn-secondary btn-sm">View Report</a>
+  </div>
+</div>
+
+<div class="win-detail-header">
+  <div class="status-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div style="flex:1;">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-sm);">
+      <h2 style="font-size:1.1rem;">{{ check.title }}</h2>
+      <span class="badge badge-{{ check.status }}">{% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}</span>
+    </div>
+    <p>{{ check.detail }}</p>
+  </div>
+  <div style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:{% if check.status == 'secure' %}var(--status-secure){% elif check.status == 'warning' %}var(--status-warning){% elif check.status == 'danger' %}var(--status-danger){% else %}var(--status-unknown){% endif %}">
+    {{ check.score }}<span style="font-size:0.8rem;color:var(--text-muted)">/100</span>
+  </div>
+</div>
+
+<div class="grid-2 gap-lg">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Status Details</h3></div>
+    <table class="section-info-table">
+      <tr><td>Status</td><td><span class="badge badge-{{ check.status }}">{% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}</span></td></tr>
+      <tr><td>Score</td><td style="font-family:'Orbitron',monospace;font-weight:600;">{{ check.score }} / 100</td></tr>
+      <tr><td>Detail</td><td>{{ check.detail }}</td></tr>
+      <tr><td>Recommendation</td><td style="color:var(--accent-green);">{{ check.recommendation }}</td></tr>
+    </table>
+    <div class="policy-hint mt-md">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>Manage accounts: <strong>Computer Management → Local Users and Groups</strong> or run <code style="color:var(--win-accent)">lusrmgr.msc</code></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Best Practices</h3></div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Disable the built-in "Administrator" account</div>
+    </div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Use a unique admin account with strong password</div>
+    </div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Limit admin account count to 1–2 users</div>
+    </div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Enable account lockout policy (GPO)</div>
+    </div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Use least-privilege for day-to-day accounts</div>
+    </div>
+    <div class="status-row">
+      <div class="status-indicator secure"></div>
+      <div>Enable multi-factor authentication where possible</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

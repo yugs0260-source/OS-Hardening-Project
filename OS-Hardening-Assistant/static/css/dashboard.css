@@ -1,0 +1,303 @@
+/* ============================================================
+   dashboard.css — Dashboard-specific styles
+   ============================================================ */
+
+/* ──────────────────────────────────────────────
+   Security Score Ring
+   ────────────────────────────────────────────── */
+.score-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+  padding: var(--space-2xl);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-section::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0,245,160,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.score-ring-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.score-ring-svg {
+  width: 160px;
+  height: 160px;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 8;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-ring-fill.grade-a { stroke: #00f5a0; filter: drop-shadow(0 0 8px rgba(0,245,160,0.6)); }
+.score-ring-fill.grade-b { stroke: #7fff00; filter: drop-shadow(0 0 8px rgba(127,255,0,0.6)); }
+.score-ring-fill.grade-c { stroke: #ffd700; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+.score-ring-fill.grade-d { stroke: #ff8c00; filter: drop-shadow(0 0 8px rgba(255,140,0,0.6)); }
+.score-ring-fill.grade-f { stroke: #ff3366; filter: drop-shadow(0 0 8px rgba(255,51,102,0.6)); }
+
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.score-info {
+  flex: 1;
+}
+
+.score-info h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.score-info .grade-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+}
+
+.score-stats {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.stat-secure  .stat-number { color: var(--status-secure); }
+.stat-warning .stat-number { color: var(--status-warning); }
+.stat-danger  .stat-number { color: var(--status-danger); }
+.stat-unknown .stat-number { color: var(--status-unknown); }
+
+/* ──────────────────────────────────────────────
+   Check Cards Grid
+   ────────────────────────────────────────────── */
+.checks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.check-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.check-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background var(--transition-normal);
+}
+
+.check-card.secure::before  { background: var(--status-secure); box-shadow: 0 0 10px var(--status-secure); }
+.check-card.warning::before { background: var(--status-warning); }
+.check-card.danger::before  { background: var(--status-danger);  box-shadow: 0 0 10px var(--status-danger); animation: blink-border 1.5s infinite; }
+.check-card.unknown::before { background: var(--status-unknown); }
+
+@keyframes blink-border {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.check-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.check-card.secure:hover  { border-color: rgba(0,245,160,0.3);  box-shadow: var(--shadow-lg), var(--glow-green); }
+.check-card.warning:hover { border-color: rgba(234,179,8,0.3);  box-shadow: var(--shadow-lg), var(--glow-yellow); }
+.check-card.danger:hover  { border-color: rgba(239,68,68,0.3);  box-shadow: var(--shadow-lg), var(--glow-red); }
+
+.check-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.check-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-card-icon svg { width: 22px; height: 22px; }
+
+.check-card.secure  .check-card-icon { background: rgba(0,245,160,0.12); color: var(--status-secure); }
+.check-card.warning .check-card-icon { background: rgba(234,179,8,0.12);  color: var(--status-warning); }
+.check-card.danger  .check-card-icon { background: rgba(239,68,68,0.12);  color: var(--status-danger); }
+.check-card.unknown .check-card-icon { background: rgba(100,116,139,0.12);color: var(--status-unknown); }
+
+.check-card-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.check-card-detail {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+
+.check-card-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.check-card-score-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-right: var(--space-md);
+}
+
+.check-card-score-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s ease;
+}
+
+.check-card.secure  .check-card-score-fill { background: var(--status-secure); }
+.check-card.warning .check-card-score-fill { background: var(--status-warning); }
+.check-card.danger  .check-card-score-fill { background: var(--status-danger); }
+.check-card.unknown .check-card-score-fill { background: var(--status-unknown); }
+
+.check-card-score-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ──────────────────────────────────────────────
+   Quick Actions
+   ────────────────────────────────────────────── */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.quick-action-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-green);
+}
+
+.quick-action-btn:hover {
+  background: rgba(0,245,160,0.08);
+  border-color: rgba(0,245,160,0.3);
+  color: var(--accent-green);
+  transform: translateY(-1px);
+}
+
+/* ──────────────────────────────────────────────
+   Refresh button animation
+   ────────────────────────────────────────────── */
+.btn-refresh.loading svg {
+  animation: spin 0.8s linear infinite;
+}

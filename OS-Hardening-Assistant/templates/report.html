@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/report.css' %}">
+{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn btn-secondary btn-sm" onclick="copyReportSummary()" aria-label="Copy">Copy Summary</button>
+<button class="btn btn-secondary btn-sm" onclick="exportReportHTML()" aria-label="Export">Export HTML</button>
+<button class="btn btn-primary btn-sm" onclick="printReport()" aria-label="Print">🖨 Print</button>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'hardening:index' %}">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Security Report</span>
+  </nav>
+  <h1>Full <span class="text-gradient">Security Report</span></h1>
+</div>
+
+<div class="report-page">
+  <div class="report-header">
+    <div class="report-brand">
+      <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div class="report-brand-text">
+        <h2>OS Hardening Assistant</h2>
+        <p>{{ platform }} Security Report</p>
+      </div>
+    </div>
+    <div class="report-meta">
+      <div class="report-date">Generated: {{ generated_at }}</div>
+      <div class="report-date">Platform: {{ os_info.system }} {{ os_info.release }}</div>
+      <div class="report-date">Host: {{ os_info.node }}</div>
+    </div>
+  </div>
+
+  <div class="report-score-summary">
+    <div class="report-score-card main">
+      <div class="big-number" style="color:{{ grade.color }}">{{ score }}</div>
+      <div class="big-label">Overall Security Score / 100</div>
+      <div style="margin-top:var(--space-sm);font-family:'Orbitron',monospace;font-size:1.2rem;color:{{ grade.color }}">Grade {{ grade.grade }} — {{ grade.label }}</div>
+    </div>
+    <div class="report-score-card"><div class="big-number" style="color:var(--status-secure)">{{ secure_count }}</div><div class="big-label">Secure</div></div>
+    <div class="report-score-card"><div class="big-number" style="color:var(--status-warning)">{{ warning_count }}</div><div class="big-label">Warning</div></div>
+    <div class="report-score-card"><div class="big-number" style="color:var(--status-danger)">{{ danger_count }}</div><div class="big-label">Danger</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Security Findings — {{ platform }}</h3></div>
+    <div class="report-checks">
+      {% for key, check in checks.items %}
+      <div class="report-check-row">
+        <div class="report-check-status-col">
+          <span class="badge badge-{{ check.status }}">
+            {% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}
+          </span>
+        </div>
+        <div class="report-check-body">
+          <div class="report-check-title">{{ check.title }}</div>
+          <div class="report-check-detail">{{ check.detail }}</div>
+          <div class="report-check-rec">{{ check.recommendation }}</div>
+        </div>
+        <div class="report-check-score-col">
+          <div class="score-num" style="color:{% if check.status == 'secure' %}var(--status-secure){% elif check.status == 'warning' %}var(--status-warning){% elif check.status == 'danger' %}var(--status-danger){% else %}var(--status-unknown){% endif %}">{{ check.score }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="card mt-lg">
+    <div class="card-header"><h3 class="card-title">Drill Down</h3></div>
+    {% if platform == 'Windows' %}
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);">
+      <a href="{% url 'hardening:win_firewall' %}" class="btn btn-secondary">Firewall →</a>
+      <a href="{% url 'hardening:win_defender' %}" class="btn btn-secondary">Defender →</a>
+      <a href="{% url 'hardening:win_updates' %}" class="btn btn-secondary">Updates →</a>
+      <a href="{% url 'hardening:win_users' %}" class="btn btn-secondary">Users →</a>
+    </div>
+    {% else %}
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);">
+      <a href="{% url 'hardening:lnx_firewall' %}" class="btn btn-secondary">UFW →</a>
+      <a href="{% url 'hardening:lnx_ssh' %}" class="btn btn-secondary">SSH →</a>
+      <a href="{% url 'hardening:lnx_fail2ban' %}" class="btn btn-secondary">Fail2ban →</a>
+      <a href="{% url 'hardening:lnx_updates' %}" class="btn btn-secondary">Updates →</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/report.js' %}"></script>
+{% endblock %}

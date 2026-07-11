@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/linux.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+  .checklist-progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: var(--radius-full); overflow: hidden; margin: var(--space-sm) 0 var(--space-md); }
+  .checklist-progress-fill { height: 100%; background: linear-gradient(90deg, var(--linux-accent), #fbbf24); border-radius: var(--radius-full); transition: width 0.5s ease; }
+  .checklist-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); cursor: pointer; transition: background var(--transition-fast); }
+  .checklist-item:hover { background: rgba(249,115,22,0.06); }
+  .checklist-item.completed { opacity: 0.55; }
+  .checklist-item.completed .checklist-task { text-decoration: line-through; }
+  .checklist-item input[type="checkbox"] { accent-color: var(--linux-accent); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+  .checklist-task { font-size: 0.875rem; flex: 1; }
+  .checklist-priority { font-size: 0.7rem; padding: 2px 8px; border-radius: var(--radius-full); font-weight: 600; text-transform: uppercase; }
+  .priority-high   { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .priority-medium { background: rgba(234,179,8,0.15); color: #eab308; }
+  .priority-low    { background: rgba(100,116,139,0.15);color: #64748b; }
+  .filter-btn { padding: 4px 14px; border-radius: var(--radius-full); font-size: 0.78rem; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all var(--transition-fast); }
+  .filter-btn.active { background: rgba(249,115,22,0.15); color: var(--linux-accent); border-color: var(--linux-accent); }
+  .filter-btn:hover { background: rgba(249,115,22,0.08); color: var(--linux-accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header linux-page">
+  <div class="page-header-inner">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'hardening:index' %}">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Linux Hardening</span>
+      </nav>
+      <h1><span style="color:#f97316">Linux</span> Hardening</h1>
+      <p class="mt-sm">Security hardening hub for Debian/Ubuntu and RHEL-based Linux systems.</p>
+    </div>
+    <a href="{% url 'hardening:lnx_report' %}" class="btn btn-primary" id="btn-lnx-report">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Linux Report
+    </a>
+  </div>
+</div>
+
+<!-- Status Cards -->
+<div class="checks-grid mb-xl">
+  {% for key, check in checks.items %}
+  <a href="{% if key == 'firewall' %}{% url 'hardening:lnx_firewall' %}{% elif key == 'ssh' %}{% url 'hardening:lnx_ssh' %}{% elif key == 'fail2ban' %}{% url 'hardening:lnx_fail2ban' %}{% elif key == 'updates' %}{% url 'hardening:lnx_updates' %}{% else %}{% url 'hardening:linux_home' %}{% endif %}"
+     class="check-card {{ check.status }}"
+     data-check="{{ key }}"
+     aria-label="{{ check.title }}: {{ check.status }}">
+    <div class="check-card-header">
+      <div class="check-card-icon" aria-hidden="true">
+        {% if key == 'firewall' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        {% elif key == 'ssh' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        {% elif key == 'fail2ban' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        {% elif key == 'updates' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        {% endif %}
+      </div>
+      <span class="badge badge-{{ check.status }}">
+        {% if check.status == 'secure' %}✓ Secure{% elif check.status == 'warning' %}⚠ Warning{% elif check.status == 'danger' %}✗ Danger{% else %}? Unknown{% endif %}
+      </span>
+    </div>
+    <div class="check-card-title">{{ check.title }}</div>
+    <div class="check-card-detail">{{ check.detail }}</div>
+    <div class="check-card-score">
+      <div class="check-card-score-bar"><div class="check-card-score-fill" style="width:{{ check.score }}%"></div></div>
+      <span class="check-card-score-num">{{ check.score }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Section Navigation -->
+<h2 class="mb-lg">Hardening Sections</h2>
+<div class="linux-section-nav">
+  <a href="{% url 'hardening:lnx_firewall' %}" class="linux-section-link" id="lslink-firewall">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+    <span class="link-label">UFW Firewall</span>
+  </a>
+  <a href="{% url 'hardening:lnx_updates' %}" class="linux-section-link" id="lslink-updates">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/></svg>
+    <span class="link-label">Updates</span>
+  </a>
+  <a href="{% url 'hardening:lnx_ssh' %}" class="linux-section-link" id="lslink-ssh">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    <span class="link-label">SSH</span>
+  </a>
+  <a href="{% url 'hardening:lnx_fail2ban' %}" class="linux-section-link" id="lslink-fail2ban">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+    <span class="link-label">Fail2ban</span>
+  </a>
+  <a href="{% url 'hardening:lnx_report' %}" class="linux-section-link" id="lslink-report">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="link-label">Report</span>
+  </a>
+</div>
+
+<div class="divider"></div>
+
+<div class="grid-2 gap-lg">
+  <!-- Checklist -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">Hardening Checklist</h3>
+        <span class="checklist-done-count" style="font-size:0.8rem;color:var(--text-muted)"></span>
+      </div>
+      <button id="btn-clear-checklist" class="btn btn-secondary btn-sm">Reset</button>
+    </div>
+    <div class="checklist-progress-bar" role="progressbar"><div class="checklist-progress-fill" style="width:0%"></div></div>
+    <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;margin-bottom:var(--space-md);">
+      <button class="filter-btn active" data-filter="all">All</button>
+      {% regroup checklist by category as by_cat %}
+      {% for cat in by_cat %}<button class="filter-btn" data-filter="{{ cat.grouper }}">{{ cat.grouper }}</button>{% endfor %}
+    </div>
+    <div style="max-height:420px;overflow-y:auto;">
+      {% for item in checklist %}
+      <div class="checklist-item" data-category="{{ item.category }}">
+        <input type="checkbox" id="{{ item.id }}" aria-label="{{ item.task }}">
+        <label class="checklist-task" for="{{ item.id }}">{{ item.task }}</label>
+        <span class="checklist-priority priority-{{ item.priority }}">{{ item.priority }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Hardening Scripts</h3></div>
+    <div class="cmd-hint mb-md">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Run with <strong>sudo</strong>. Click a script to view and download.
+    </div>
+    {% for script in scripts %}
+    <div class="status-row">
+      <div class="card-icon card-icon-orange" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:0.875rem;font-weight:500;color:var(--text-primary);">{{ script.name }}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">{{ script.description|truncatechars:70 }}</div>
+      </div>
+      <span class="badge {% if script.risk == 'medium' %}badge-warning{% else %}badge-secure{% endif %}">{{ script.risk }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checklist.js' %}"></script>
+{% endblock %}
